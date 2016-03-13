@@ -1,8 +1,10 @@
 note
-	description: "Summary description for {EG_APPLICATION}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "[
+		Representation of a root class {EG_APPLICATION}
+		]"
+	design: "[
+		EG = ECF Generator
+		]"
 
 class
 	EG_APPLICATION
@@ -13,7 +15,7 @@ create
 feature {NONE} -- Initialization
 
 	make
-			-- ??
+			-- `make' Current.
 		do
 			create application
 			create window.make_with_title ("ECF Generator for Windows")

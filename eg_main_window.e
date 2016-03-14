@@ -281,12 +281,14 @@ feature {NONE} -- Implementation: Basic Operations
 
 	process_ecf_content
 			-- `process_ecf_content'.
---		local
---			l_dialog: EV_MESSAGE_DIALOG
+		note
+			replace_me: "The dialog solution (below) is not what we ultiamtely want. This is temporary code. Remove it."
+		local
+			l_dialog: EV_MESSAGE_DIALOG
 		do
---			create l_dialog.make_with_text (ecf_content)
---			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
---			l_dialog.show
+			create l_dialog.make_with_text (ecf_content)
+			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
+			l_dialog.show
 		end
 
 feature {NONE} -- Implementation: Replacement

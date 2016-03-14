@@ -14,15 +14,16 @@
 		<library name="state_machine" location="$GITHUB\state_machine\state_machine.ecf"/>
 		<library name="thread" location="$ISE_LIBRARY\library\thread\thread-safe.ecf"/>
 		<library name="uuid" location="$ISE_LIBRARY\library\uuid\uuid-safe.ecf"/>
+		<library name="validation" location="$GITHUB\validation\validation.ecf"/>
 		<library name="vision2" location="$ISE_LIBRARY\library\vision2\vision2-safe.ecf"/>
 		<library name="vision2_extension" location="$ISE_LIBRARY\library\vision2_extension\vision2_extension-safe.ecf"/>
 		<cluster name="ecfwingen" location=".\" recursive="true">
 			<file_rule>
-				<exclude>/.git$</exclude>
-				<exclude>/.svn$</exclude>
-				<exclude>/CVS$</exclude>
 				<exclude>/EIFGENs$</exclude>
 				<exclude>tests</exclude>
+				<exclude>/CVS$</exclude>
+				<exclude>/.svn$</exclude>
+				<exclude>/.git$</exclude>
 			</file_rule>
 		</cluster>
 	</target>
@@ -31,9 +32,9 @@
 		<root class="ANY" feature="default_create"/>
 		<file_rule>
 			<exclude>/.git$</exclude>
-			<exclude>/.svn$</exclude>
-			<exclude>/CVS$</exclude>
 			<exclude>/EIFGENs$</exclude>
+			<exclude>/CVS$</exclude>
+			<exclude>/.svn$</exclude>
 			<include>tests</include>
 		</file_rule>
 		<option profile="false">

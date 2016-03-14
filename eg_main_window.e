@@ -99,6 +99,14 @@ feature {NONE} -- Initialization
 			create control_cancel.make_with_text ("Cancel")
 
 			create lower_vbox
+
+
+				-- Validators
+			create ecf_name_validator.make (ecf_text, create {EG_ECF_NAME_ITEM})
+			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
+			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
+			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
+			
 			Precursor
 		end
 
@@ -293,8 +301,6 @@ feature {NONE} -- Implementation: ECF Write
 			-- `write_root_folder' for Current
 		local
 			l_path: PATH
-			l_directory: DIRECTORY
-			l_file: PLAIN_TEXT_FILE
 		do
 			create l_path.make_from_string (github_text.text + "\" + ecf_text.text)
 			create_folder (l_path, l_path.absolute_path.name + "\" + ecf_text.text + ".ecf", ecf_content)
@@ -472,6 +478,20 @@ feature {NONE} -- Implementation: GUI
 	control_cancel: EV_BUTTON
 
 	lower_vbox: EV_VERTICAL_BOX
+
+feature {NONE} -- Implementation: Validators
+
+	ecf_name_validator: VA_EV_TEXT_COMPONENT_VALIDATOR [EG_ECF_NAME_ITEM]
+			-- `ecf_name_validator' to validate `ecf_text'.
+
+	std_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
+			-- `std_list_validator' to validate `std_lib_list'.
+
+	test_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
+			-- `test_list_validator' to validate `test_lib_list'.
+
+	github_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
+			-- `github_list_validator' to validate `github_lib_list'.
 
 feature {NONE} -- Implementation: Constants
 

@@ -252,7 +252,7 @@ feature {NONE} -- Initialization
 			Precursor
 		end
 
-feature {NONE} -- Implementation: Basic Operations
+feature {NONE} -- Implementation: Access
 
 	ecf_content: STRING
 			-- `ecf_content' which will get written to ECF file.
@@ -260,11 +260,21 @@ feature {NONE} -- Implementation: Basic Operations
 			create Result.make_empty
 		end
 
+feature {NONE} -- Implementation: ECF Write
+
 	on_create
 			-- What happens `on_create'.
+		local
+			l_dialog: EV_MESSAGE_DIALOG
 		do
 			build_ecf_content
-			process_ecf_content
+			write_root_folder
+			write_test_folder_and_class
+
+			create l_dialog.make_with_text ("Project folder created in:%N%N" + github_text.text)
+			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
+			l_dialog.set_minimum_size (300, 200)
+			l_dialog.show
 		end
 
 	build_ecf_content
@@ -279,19 +289,65 @@ feature {NONE} -- Implementation: Basic Operations
 			replace_testing (ecf_content)
 		end
 
-	process_ecf_content
-			-- `process_ecf_content'.
-		note
-			replace_me: "The dialog solution (below) is not what we ultiamtely want. This is temporary code. Remove it."
+	write_root_folder
+			-- `write_root_folder' for Current
 		local
-			l_dialog: EV_MESSAGE_DIALOG
+			l_path: PATH
+			l_directory: DIRECTORY
+			l_file: PLAIN_TEXT_FILE
 		do
-			create l_dialog.make_with_text (ecf_content)
-			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
-			l_dialog.show
+			create l_path.make_from_string (github_text.text + "\" + ecf_text.text)
+			create_folder (l_path, l_path.absolute_path.name + "\" + ecf_text.text + ".ecf", ecf_content)
 		end
 
-feature {NONE} -- Implementation: Replacement
+	write_test_folder_and_class
+			-- `write_test_folder_and_class'.
+		local
+			l_content: STRING
+			l_path: PATH
+			l_class_text_class_name: STRING
+			l_class_file_name: STRING
+		do
+				-- Test folder ...
+			create l_path.make_from_string (github_text.text + "\" + ecf_text.text + "\tests")
+
+				-- Test class ...
+			l_class_text_class_name := ecf_text.text.twin
+			l_class_text_class_name.to_upper
+
+			l_class_file_name := ecf_text.text.twin
+			l_class_file_name.to_upper
+			l_class_file_name.append ("_test_set.e")
+
+			l_content := {EG_CONSTANTS}.test_class_template_string.twin
+			l_content.replace_substring_all ("<<TEST_CLASS_NAME>>", l_class_text_class_name)
+
+			create_folder (l_path, l_path.absolute_path.name + "\" + l_class_file_name, l_content)
+		end
+
+	create_folder (a_path: PATH; a_file_name: IMMUTABLE_STRING_32; a_content: detachable STRING_8)
+			-- create_folder from optional `a_path' and `a_content'.
+			-- (export status {NONE})
+		require
+			has_file_and_content: attached a_file_name implies attached a_content
+		local
+			l_dir: DIRECTORY
+			l_file: PLAIN_TEXT_FILE
+		do
+			create l_dir.make_with_path (a_path)
+			if not l_dir.exists then
+				l_dir.create_dir
+			end
+			check
+				has_file_and_content: attached a_file_name as al_file_name and then attached a_content as al_content
+			then
+				create l_file.make_create_read_write (al_file_name)
+				l_file.put_string (al_content)
+				l_file.close
+			end
+		end
+
+feature {NONE} -- Implementation: Replacements
 
 	replace_standard (a_content: STRING)
 			-- `replace_standard' libraries list in `a_content'.

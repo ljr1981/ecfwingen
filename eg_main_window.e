@@ -106,7 +106,21 @@ feature {NONE} -- Initialization
 			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
 			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
 			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
-			
+
+			create validation_controller.make_with_machine (create {VA_MACHINE})
+			create validation_controller_item
+
+			validation_controller_item.add_rule (agent ecf_name_validator.is_valid)
+			validation_controller_item.add_rule (agent std_list_validator.is_valid)
+			validation_controller_item.add_rule (agent test_list_validator.is_valid)
+			validation_controller_item.add_rule (agent github_list_validator.is_valid)
+--			validation_controller.set_validate ([validation_controller_item])
+
+			ecf_text.focus_out_actions.extend (agent on_check_validation_controller)
+			std_lib_list.select_actions.extend (agent on_check_validation_controller)
+			test_lib_list.select_actions.extend (agent on_check_validation_controller)
+			github_lib_list.select_actions.extend (agent on_check_validation_controller)
+
 			Precursor
 		end
 
@@ -200,6 +214,7 @@ feature {NONE} -- Initialization
 
 			control_create.select_actions.extend (agent on_create)
 			control_cancel.select_actions.extend (agent close_request_actions.call ([Void]))
+			control_create.disable_sensitive
 
 				-- Put all in `main_vbox' ...
 			main_vbox.extend (ecf_hbox)
@@ -283,6 +298,17 @@ feature {NONE} -- Implementation: ECF Write
 			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
 			l_dialog.set_minimum_size (300, 200)
 			l_dialog.show
+		end
+
+	on_check_validation_controller
+			-- `on_check_validation_controller'.
+		do
+			validation_controller.validate.start ([Void])
+			if validation_controller.is_valid then
+				control_create.enable_sensitive
+			else
+				control_create.disable_sensitive
+			end
 		end
 
 	build_ecf_content
@@ -480,6 +506,12 @@ feature {NONE} -- Implementation: GUI
 	lower_vbox: EV_VERTICAL_BOX
 
 feature {NONE} -- Implementation: Validators
+
+	validation_controller: VA_VALIDATOR
+			-- `validation_controller' for Current.
+
+	validation_controller_item: VA_ITEM
+			-- `validation_controller_item' for Current.
 
 	ecf_name_validator: VA_EV_TEXT_COMPONENT_VALIDATOR [EG_ECF_NAME_ITEM]
 			-- `ecf_name_validator' to validate `ecf_text'.

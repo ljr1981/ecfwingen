@@ -8,6 +8,21 @@ note
 		
 		HINT: Start with the notes at the bottom of the class!
 		]"
+	todo: "[
+		There are additional items yet to be done to make this work well!
+		(e.g. other validation rules to include).
+		
+		(1) When SCOOP'd, then the thread library needs to be included. Otherwise,
+			the window is not valid for creating the new ECF (e.g. the new ECF will
+			fail to compile because for SCOOP we need the threading 
+			library--I think--double check this).
+		(2) The testing library ought to be demanded and non-optional. The other
+			choice is to say we will not create the tests folder nor the *_TEST_SET.e
+			class if the library is not included. However, testing is a non-optional
+			matter in software development. However, that is not really the argument.
+			The argument is: How do I want to do my testing? By the conventions of this
+			program and its structure of the project or my own?
+		]"
 
 class
 	EG_MAIN_WINDOW
@@ -26,101 +41,17 @@ feature {NONE} -- Initialization
 
 	create_interface_objects
 			-- <Precursor>
-		local
-			l_env: EXECUTION_ENVIRONMENT
-			l_randomizer: RANDOMIZER
 		do
-			create main_vbox
-
-				-- ECF widgets ...
-			create ecf_hbox
-			create ecf_label.make_with_text ("ECF name:")
-			create ecf_text.make_with_text ("[Enter ECF project name ...]")
-			ecf_text.focus_in_actions.extend (agent ecf_text.select_all)
-
-				-- Github widgets ...
-			create github_hbox
-			create github_label.make_with_text ("GITHUB environment variable: ")
-			create l_env
-			if attached {STRING_32} l_env.starting_environment ["GITHUB"] as al_github_path  then
-				create github_text.make_with_text (al_github_path)
-			else
-				create github_text.make_with_text ("Unknown ...")
-			end
-			github_text.disable_edit
-
-				-- UUID widgets ...
-			create uuid_hbox
-			create uuid_label.make_with_text ("Generated UUID: ")
-			create l_randomizer
-			create uuid_text.make_with_text (l_randomizer.uuid.out)
-			uuid_text.disable_edit
-
-			create upper_libraries_hbox
-
-				-- Std Library widgets ...
-			create std_lib_vbox
-			create std_lib_label.make_with_text ("Std. Eiffel libraries: ")
-			std_lib_label.align_text_left
-			create std_lib_list
-			std_lib_list.set_minimum_height (150)
-
-			create threaded_check.make_with_text ("Threaded?")
-			create scooped_check.make_with_text ("SCOOP'd?")
-			create windows_app.make_with_text ("Windows application?")
-			create docs_init.make_with_text ("Initialize docs folder?")
-
-				-- Testing Library widgets ...
-			create test_lib_vbox
-			create test_lib_label.make_with_text ("Test libraries: ")
-			test_lib_label.align_text_left
-			create test_lib_list
-			test_lib_list.set_minimum_height (150)
-
-
-			create init_mock_check.make_with_text ("Create initial MOCK?")
-			create init_test_set_check.make_with_text ("Create initial *_TEST_SET?")
-			init_mock_check.toggle
-			init_test_set_check.toggle
-
-				-- Github Library widgets ...
-			create github_lib_vbox
-			create github_lib_label.make_with_text ("GitHub libraries: ")
-			github_lib_label.align_text_left
-			create github_lib_list
-			github_lib_list.set_minimum_height (150)
-
-			create lower_libraries_hbox
-
-				-- Create and Cancel widgets ...
-			create control_hbox
-
-			create control_create.make_with_text ("Create ECF")
-			create control_cancel.make_with_text ("Cancel")
-
-			create lower_vbox
-
-
-				-- Validators
-			create ecf_name_validator.make (ecf_text, create {EG_ECF_NAME_ITEM})
-			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
-			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
-			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
-
-			create validation_controller.make_with_machine (create {VA_MACHINE})
-			create validation_controller_item
-
-			validation_controller_item.add_rule (agent ecf_name_validator.is_valid)
-			validation_controller_item.add_rule (agent std_list_validator.is_valid)
-			validation_controller_item.add_rule (agent test_list_validator.is_valid)
-			validation_controller_item.add_rule (agent github_list_validator.is_valid)
---			validation_controller.set_validate ([validation_controller_item])
-
-			ecf_text.focus_out_actions.extend (agent on_check_validation_controller)
-			std_lib_list.select_actions.extend (agent on_check_validation_controller)
-			test_lib_list.select_actions.extend (agent on_check_validation_controller)
-			github_lib_list.select_actions.extend (agent on_check_validation_controller)
-
+			create_primary_containers
+			create_ecf_widgets
+			create_github_widgets
+			create_uuid_widgets
+			create_std_lib_widgets
+			create_testing_lib_widgets
+			create_testing_lib_widgets
+			create_github_lib_widgets
+			create_create_and_cancel_widgets
+			create_validators
 			Precursor
 		end
 
@@ -130,149 +61,19 @@ feature {NONE} -- Initialization
 			l_file: PLAIN_TEXT_FILE
 			l_list: LIST [STRING]
 		do
-				-- ECF information
-			ecf_hbox.extend (ecf_label)
-			ecf_hbox.extend (ecf_text)
-			ecf_hbox.disable_item_expand (ecf_label)
-
-			ecf_hbox.set_padding (2)
-			ecf_hbox.set_border_width (2)
-
-				-- GITHUB information
-			github_hbox.extend (github_label)
-			github_hbox.extend (github_text)
-			github_hbox.disable_item_expand (github_label)
-
-			github_hbox.set_padding (2)
-			github_hbox.set_border_width (2)
-
-				-- UUID information
-			uuid_hbox.extend (uuid_label)
-			uuid_hbox.extend (uuid_text)
-			uuid_hbox.disable_item_expand (uuid_label)
-
-			uuid_hbox.set_padding (2)
-			uuid_hbox.set_border_width (2)
-
-				-- Standard libraries
-			std_lib_vbox.extend (std_lib_label)
-			std_lib_vbox.extend (std_lib_list)
-			std_lib_vbox.extend (threaded_check)
-			std_lib_vbox.extend (scooped_check)
-			std_lib_vbox.extend (windows_app)
-			std_lib_vbox.extend (docs_init)
-			std_lib_vbox.disable_item_expand (std_lib_label)
-			std_lib_vbox.disable_item_expand (std_lib_list)
-			std_lib_vbox.disable_item_expand (threaded_check)
-			std_lib_vbox.disable_item_expand (scooped_check)
-			std_lib_vbox.disable_item_expand (windows_app)
-			std_lib_vbox.disable_item_expand (docs_init)
-			upper_libraries_hbox.extend (std_lib_vbox)
-
-			std_lib_vbox.set_padding (2)
-			std_lib_vbox.set_border_width (2)
-
-				-- Test libraries
-			test_lib_vbox.extend (test_lib_label)
-			test_lib_vbox.extend (test_lib_list)
-			test_lib_vbox.extend (init_mock_check)
-			test_lib_vbox.extend (init_test_set_check)
-			test_lib_vbox.disable_item_expand (test_lib_label)
-			test_lib_vbox.disable_item_expand (test_lib_list)
-			test_lib_vbox.disable_item_expand (init_mock_check)
-			test_lib_vbox.disable_item_expand (init_test_set_check)
-			upper_libraries_hbox.extend (test_lib_vbox)
-
-			test_lib_vbox.set_padding (2)
-			test_lib_vbox.set_border_width (2)
-
-				-- Github libraries
-			github_lib_vbox.extend (github_lib_label)
-			github_lib_vbox.extend (github_lib_list)
-			github_lib_vbox.disable_item_expand (github_lib_label)
-			github_lib_vbox.disable_item_expand (github_lib_list)
-			lower_libraries_hbox.extend (github_lib_vbox)
-
-			github_lib_vbox.set_padding (2)
-			github_lib_vbox.set_border_width (2)
-
-			lower_libraries_hbox.extend (create {EV_CELL})
-
-			lower_vbox.extend (upper_libraries_hbox)
-			lower_vbox.extend (lower_libraries_hbox)
-
-			lower_vbox.set_padding (2)
-			lower_vbox.set_border_width (2)
-
-				-- Create and cancel controls
-			control_hbox.extend (create {EV_CELL})
-			control_hbox.extend (control_create)
-			control_hbox.extend (control_cancel)
-			control_hbox.extend (create {EV_CELL})
-			control_hbox.disable_item_expand (control_create)
-			control_hbox.disable_item_expand (control_cancel)
-
-			control_create.select_actions.extend (agent on_create)
-			control_cancel.select_actions.extend (agent close_request_actions.call ([Void]))
-			control_create.disable_sensitive
-
-				-- Put all in `main_vbox' ...
-			main_vbox.extend (ecf_hbox)
-			main_vbox.extend (github_hbox)
-			main_vbox.extend (uuid_hbox)
-			main_vbox.extend (lower_vbox)
-			main_vbox.extend (control_hbox)
-
-			main_vbox.disable_item_expand (ecf_hbox)
-			main_vbox.disable_item_expand (github_hbox)
-			main_vbox.disable_item_expand (uuid_hbox)
-			main_vbox.disable_item_expand (lower_vbox)
-			main_vbox.disable_item_expand (control_hbox)
-
-			main_vbox.set_padding (2)
-			main_vbox.set_border_width (2)
-
-				-- Put `main_vbox' into window (Current) ...
+			init_ecf_controls
+			init_github_controls
+			init_uuid_controls
+			init_std_list_controls
+			init_test_list_controls
+			init_github_list_controls
+			init_all_libraries_vbox
+			init_create_and_cancel_controls
+			place_in_main_box
 			extend (main_vbox)
-
-				-- Load "lists" from "ini" files (standard, test, and github)
-				-- std_libs.ini
-			create l_file.make_open_read ("std_libs.ini")
-			l_file.read_stream (l_file.count)
-			l_list := l_file.last_string.split ('%N')
-			l_file.close
-
-			across
-				l_list as ic_list
-			loop
-				std_lib_list.force (create {EV_LIST_ITEM}.make_with_text (ic_list.item))
-			end
-
-				-- test_libs.ini
-			create l_file.make_open_read ("test_libs.ini")
-			l_file.read_stream (l_file.count)
-			l_list := l_file.last_string.split ('%N')
-			l_file.close
-
-			across
-				l_list as ic_list
-			loop
-				test_lib_list.force (create {EV_LIST_ITEM}.make_with_text (ic_list.item))
-			end
-
-				-- github_libs.ini
-			create l_file.make_open_read ("github_libs.ini")
-			l_file.read_stream (l_file.count)
-			l_list := l_file.last_string.split ('%N')
-			l_file.close
-
-			across
-				l_list as ic_list
-			loop
-				github_lib_list.force (create {EV_LIST_ITEM}.make_with_text (ic_list.item))
-			end
-
+			load_all_library_lists
 			Precursor
+			validation_controller.set_validate ([validation_controller_item])
 		end
 
 feature {NONE} -- Implementation: Access
@@ -302,17 +103,42 @@ feature {NONE} -- Implementation: ECF Write
 
 	on_check_validation_controller
 			-- `on_check_validation_controller'.
+		note
+			design: "[
+				This is what happens when validation of the entire window is
+				called for based on some user change action.
+				]"
 		do
-			validation_controller.validate.start ([Void])
+			validation_controller.validate.start ([validation_controller_item])
 			if validation_controller.is_valid then
-				control_create.enable_sensitive
+				create_button.enable_sensitive
 			else
-				control_create.disable_sensitive
+				create_button.disable_sensitive
 			end
+		end
+
+	on_list_check_validation_controller (a_item: EV_LIST_ITEM)
+			-- `on_list_check_validation_controller' of `a_item'.
+		note
+			design: "[
+				This is a "passthrough" feature designed to take
+				the passed `a_item' and then strip it, just calling
+				the `on_check_validation_controller'. This allows
+				lists to send their checked/unchecked `a_item', but
+				ignoring it (e.g. stripping).
+				]"
+		do
+			on_check_validation_controller
 		end
 
 	build_ecf_content
 			-- `build_ecf_content'.
+		note
+			design: "[
+				Reset the `ecf_content' to a known starting point (e.g. template)
+				and then start replacing <<TAGS>> in the string from the controls
+				in the window.
+				]"
 		do
 			ecf_content := constants.ecf_template_string.twin
 			replace_ecf_project_name (ecf_content, ecf_text.text)
@@ -500,10 +326,10 @@ feature {NONE} -- Implementation: GUI
 
 		-- Create and Cancel controls
 	control_hbox: EV_HORIZONTAL_BOX
-	control_create: EV_BUTTON
-	control_cancel: EV_BUTTON
+	create_button: EV_BUTTON
+	cancel_button: EV_BUTTON
 
-	lower_vbox: EV_VERTICAL_BOX
+	all_libraries_vbox: EV_VERTICAL_BOX
 
 feature {NONE} -- Implementation: Validators
 
@@ -531,6 +357,373 @@ feature {NONE} -- Implementation: Constants
 			-- `constants'
 		once
 			create Result
+		end
+
+feature {NONE} -- Implementation: Creators
+
+	create_primary_containers
+			-- `create_primary_containers' for Current.
+		note
+			design: "[
+				The `main_vbox' is what goes into the window (Current).
+				Within it are: `all_libraries_vbox', which contains
+				`upper_libraries_hbox' and `lower_libraries_hbox', which
+				have the lists of std and testing libraries in the upper
+				and github libraries list and an empty {EV_CELL}.
+				]"
+		do
+			create main_vbox
+			create all_libraries_vbox
+			create upper_libraries_hbox
+			create lower_libraries_hbox
+		end
+
+	create_ecf_widgets
+			-- `create_ecf_widgets' for Current.
+		note
+			design: "[
+				Has the label and text box control for naming the ECF by
+				user input.
+				]"
+		do
+			create ecf_hbox
+			create ecf_label.make_with_text ("ECF name:")
+			create ecf_text.make_with_text ("[Enter ECF project name ...]")
+			ecf_text.focus_in_actions.extend (agent ecf_text.select_all)
+		end
+
+	create_github_widgets
+			-- `create_github_widgets' for Current.
+		note
+			design: "[
+				Has the label and text box control for establishing the
+				GITHUB environment variable. This is loaded directly from
+				the {EXECUTION_ENVIRONMENT}.
+				]"
+		local
+			l_env: EXECUTION_ENVIRONMENT
+		do
+			create github_hbox
+			create github_label.make_with_text ("GITHUB environment variable: ")
+			create l_env
+			if attached {STRING_32} l_env.starting_environment ["GITHUB"] as al_github_path  then
+				create github_text.make_with_text (al_github_path)
+				github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 1.0))
+			else
+				create github_text.make_with_text ("Unknown ...")
+				github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
+			end
+			github_text.disable_edit
+		end
+
+	create_uuid_widgets
+			-- `create_uuid_widgets' for Current.
+		note
+			design: "[
+				Has the label and text box control for establishing the
+				UUID, which is derived from the {RANDOMIZER}.uuid feature.
+				]"
+		local
+			l_randomizer: RANDOMIZER
+		do
+			create l_randomizer
+			create uuid_hbox
+			create uuid_label.make_with_text ("Generated UUID: ")
+			create l_randomizer
+			create uuid_text.make_with_text (l_randomizer.uuid.out)
+			uuid_text.disable_edit
+		end
+
+	create_std_lib_widgets
+			-- `create_std_lib_widgets' for Current.
+		note
+			design: "[
+				Has the label and list control for establishing a
+				list of standard libraries selected for inclusion
+				in the ECF when complete.
+				
+				Also has associated checkboxes for other dependencies.
+				]"
+		do
+			create std_lib_vbox
+			create std_lib_label.make_with_text ("Std. Eiffel libraries: ")
+			std_lib_label.align_text_left
+			create std_lib_list
+			std_lib_list.set_minimum_height (150)
+
+			create threaded_check.make_with_text ("Threaded?")
+			create scooped_check.make_with_text ("SCOOP'd?")
+			create windows_app.make_with_text ("Windows application?")
+			create docs_init.make_with_text ("Initialize docs folder?")
+		end
+
+
+	create_testing_lib_widgets
+			-- `create_testing_lib_widgets' for Current.
+		note
+			design: "[
+				Has the label and list control for establishing a
+				list of testing libraries selected for inclusion
+				in the ECF when complete.
+				
+				Also has associated checkboxes for other dependencies.
+				]"
+		do
+			create test_lib_vbox
+			create test_lib_label.make_with_text ("Test libraries: ")
+			test_lib_label.align_text_left
+			create test_lib_list
+			test_lib_list.set_minimum_height (150)
+
+
+			create init_mock_check.make_with_text ("Create initial MOCK?")
+			create init_test_set_check.make_with_text ("Create initial *_TEST_SET?")
+			init_mock_check.toggle
+			init_test_set_check.toggle
+		end
+
+	create_github_lib_widgets
+			-- `create_github_lib_widgets' for Current.
+		note
+			design: "[
+				Has the label and list control for establishing a
+				list of Github libraries selected for inclusion
+				in the ECF when complete.
+				
+				Also has associated checkboxes for other dependencies.
+				]"
+		do
+			create github_lib_vbox
+			create github_lib_label.make_with_text ("GitHub libraries: ")
+			github_lib_label.align_text_left
+			create github_lib_list
+			github_lib_list.set_minimum_height (150)
+		end
+
+	create_create_and_cancel_widgets
+				-- `create_create_and_cancel_widgets' for Current.
+		note
+			design: "[
+				Buttons for "Create" and "Cancel", where the initial
+				state of the creation button is disabled sensitive.
+				]"
+		do
+			create control_hbox
+			create create_button.make_with_text ("Create ECF")
+			create cancel_button.make_with_text ("Cancel")
+		end
+
+	create_validators
+			-- `create_validators' for Current.
+		note
+			design: "[
+				Validators are like a Flux Capacitor: They are what make
+				validation possible (HA!).
+				
+				(1) Create each validator with its validation item. The item
+					is what has the "rule" for validation. The validator is
+					responsible for applying it and answer the `is_valid' question.
+				(2) Once all the item validators are created, make the overall
+					validation controller. This controller is what figures out
+					if the entire data-set of the window is valid and ready to
+					create the ECF or not.
+				(3) The last step is to trigger the overall validation controller
+					at each point where the user can make changes to the data in
+					the controls on the window. Therefore, we use the change-actions,
+					and checking and unchecking actions of the lists.
+					
+					NOTE: This is NOT the ultimate solution. What we really want
+							is something more elegant based on the pub-sub model.
+							Until we can engineer that solution, we'll stick with
+							the "actions" solution as implemented below.
+				]"
+		do
+				-- Validators
+			create ecf_name_validator.make (ecf_text, create {EG_ECF_NAME_ITEM})
+			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
+			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
+			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
+
+				-- Validation controller and item
+			create validation_controller.make_with_machine (create {VA_MACHINE})
+			create validation_controller_item
+
+			validation_controller_item.add_rule (agent ecf_name_validator.is_valid)
+			validation_controller_item.add_rule (agent std_list_validator.is_valid)
+			validation_controller_item.add_rule (agent test_list_validator.is_valid)
+			validation_controller_item.add_rule (agent github_list_validator.is_valid)
+
+				-- Validation triggering
+				-- Temporary bandaid code: Really needs to be pub-sub'd
+			ecf_text.change_actions.extend (agent on_check_validation_controller)
+			std_lib_list.check_actions.extend (agent on_list_check_validation_controller)
+			std_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
+			test_lib_list.check_actions.extend (agent on_list_check_validation_controller)
+			test_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
+			github_lib_list.check_actions.extend (agent on_list_check_validation_controller)
+			github_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
+		end
+
+feature {NONE} -- Implementation: Initializers
+
+	init_ecf_controls
+			-- `init_ecf_controls' for Current.
+		do
+			ecf_hbox.extend (ecf_label)
+			ecf_hbox.extend (ecf_text)
+			ecf_hbox.disable_item_expand (ecf_label)
+
+			ecf_hbox.set_padding (2)
+			ecf_hbox.set_border_width (2)
+		end
+
+	init_github_controls
+			-- `init_github_controls' for Current.
+		do
+			github_hbox.extend (github_label)
+			github_hbox.extend (github_text)
+			github_hbox.disable_item_expand (github_label)
+
+			github_hbox.set_padding (2)
+			github_hbox.set_border_width (2)
+		end
+
+	init_uuid_controls
+			-- `init_uuid_controls' for Current.
+		do
+			uuid_hbox.extend (uuid_label)
+			uuid_hbox.extend (uuid_text)
+			uuid_hbox.disable_item_expand (uuid_label)
+
+			uuid_hbox.set_padding (2)
+			uuid_hbox.set_border_width (2)
+
+		end
+
+	init_std_list_controls
+			-- `init_std_list_controls' for Current.
+		do
+			std_lib_vbox.extend (std_lib_label)
+			std_lib_vbox.extend (std_lib_list)
+			std_lib_vbox.extend (threaded_check)
+			std_lib_vbox.extend (scooped_check)
+			std_lib_vbox.extend (windows_app)
+			std_lib_vbox.extend (docs_init)
+			std_lib_vbox.disable_item_expand (std_lib_label)
+			std_lib_vbox.disable_item_expand (std_lib_list)
+			std_lib_vbox.disable_item_expand (threaded_check)
+			std_lib_vbox.disable_item_expand (scooped_check)
+			std_lib_vbox.disable_item_expand (windows_app)
+			std_lib_vbox.disable_item_expand (docs_init)
+			upper_libraries_hbox.extend (std_lib_vbox)
+
+			std_lib_vbox.set_padding (2)
+			std_lib_vbox.set_border_width (2)
+
+		end
+
+	init_test_list_controls
+			-- `init_test_list_controls' for Current.
+		do
+			test_lib_vbox.extend (test_lib_label)
+			test_lib_vbox.extend (test_lib_list)
+			test_lib_vbox.extend (init_mock_check)
+			test_lib_vbox.extend (init_test_set_check)
+			test_lib_vbox.disable_item_expand (test_lib_label)
+			test_lib_vbox.disable_item_expand (test_lib_list)
+			test_lib_vbox.disable_item_expand (init_mock_check)
+			test_lib_vbox.disable_item_expand (init_test_set_check)
+			upper_libraries_hbox.extend (test_lib_vbox)
+
+			test_lib_vbox.set_padding (2)
+			test_lib_vbox.set_border_width (2)
+
+		end
+
+	init_github_list_controls
+			-- `init_github_list_controls' for Current.
+		do
+			github_lib_vbox.extend (github_lib_label)
+			github_lib_vbox.extend (github_lib_list)
+			github_lib_vbox.disable_item_expand (github_lib_label)
+			github_lib_vbox.disable_item_expand (github_lib_list)
+			lower_libraries_hbox.extend (github_lib_vbox)
+
+			github_lib_vbox.set_padding (2)
+			github_lib_vbox.set_border_width (2)
+
+			lower_libraries_hbox.extend (create {EV_CELL})
+		end
+
+	init_all_libraries_vbox
+			-- `init_all_libraries_vbox' for Current.
+		do
+			all_libraries_vbox.extend (upper_libraries_hbox)
+			all_libraries_vbox.extend (lower_libraries_hbox)
+
+			all_libraries_vbox.set_padding (2)
+			all_libraries_vbox.set_border_width (2)
+		end
+
+	init_create_and_cancel_controls
+			-- `init_create_and_cancel_controls' for Current.
+		do
+			control_hbox.extend (create {EV_CELL})
+			control_hbox.extend (create_button)
+			control_hbox.extend (cancel_button)
+			control_hbox.extend (create {EV_CELL})
+			control_hbox.disable_item_expand (create_button)
+			control_hbox.disable_item_expand (cancel_button)
+
+			create_button.select_actions.extend (agent on_create)
+			cancel_button.select_actions.extend (agent close_request_actions.call ([Void]))
+			create_button.disable_sensitive
+		end
+
+	place_in_main_box
+			-- `place_in_main_box' for Current.
+		do
+			main_vbox.extend (ecf_hbox)
+			main_vbox.extend (github_hbox)
+			main_vbox.extend (uuid_hbox)
+			main_vbox.extend (all_libraries_vbox)
+			main_vbox.extend (control_hbox)
+
+			main_vbox.disable_item_expand (ecf_hbox)
+			main_vbox.disable_item_expand (github_hbox)
+			main_vbox.disable_item_expand (uuid_hbox)
+			main_vbox.disable_item_expand (all_libraries_vbox)
+			main_vbox.disable_item_expand (control_hbox)
+
+			main_vbox.set_padding (2)
+			main_vbox.set_border_width (2)
+		end
+
+	load_all_library_lists
+			-- `load_all_library_lists' for Current.
+		do
+			load_library_list ("std_libs.ini", std_lib_list)
+			load_library_list ("test_libs.ini", test_lib_list)
+			load_library_list ("github_libs.ini", github_lib_list)
+
+		end
+
+	load_library_list (a_ini_name: STRING; a_lib_list: EV_CHECKABLE_LIST)
+			-- `load_library_list' for Current.
+		local
+			l_file: PLAIN_TEXT_FILE
+			l_list: LIST [STRING]
+		do
+			create l_file.make_open_read (a_ini_name)
+			l_file.read_stream (l_file.count)
+			l_list := l_file.last_string.split ('%N')
+			l_file.close
+
+			across
+				l_list as ic_list
+			loop
+				a_lib_list.force (create {EV_LIST_ITEM}.make_with_text (ic_list.item))
+			end
 		end
 
 note

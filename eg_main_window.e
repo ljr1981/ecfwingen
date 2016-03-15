@@ -22,6 +22,11 @@ note
 			matter in software development. However, that is not really the argument.
 			The argument is: How do I want to do my testing? By the conventions of this
 			program and its structure of the project or my own?
+		(3) Add in code to generate the git ignore and other files needed for github
+			as well as repo creation and pushing the code up to github.
+		(4) MOCK? The checkbox really needs to control this.
+		(5) TEST_SET? Ibid.
+		(6) Windows app? Ibid.
 		]"
 
 class
@@ -95,7 +100,7 @@ feature {NONE} -- Implementation: ECF Write
 			write_root_folder
 			write_test_folder_and_class
 
-			create l_dialog.make_with_text ("Project folder created in:%N%N" + github_text.text)
+			create l_dialog.make_with_text ("Project folder created in:%N%N" + github_text.text + "\" + ecf_text.text + ".ecf")
 			l_dialog.set_buttons_and_actions (<<"OK">>, <<agent l_dialog.destroy_and_exit_if_last>>)
 			l_dialog.set_minimum_size (300, 200)
 			l_dialog.show

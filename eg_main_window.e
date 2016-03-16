@@ -47,6 +47,7 @@ feature {NONE} -- Initialization
 	create_interface_objects
 			-- <Precursor>
 		do
+			create ecf_writer
 			create_primary_containers
 			create_ecf_widgets
 			create_github_widgets
@@ -88,6 +89,9 @@ feature {NONE} -- Implementation: Access
 		attribute
 			create Result.make_empty
 		end
+
+	ecf_writer: EG_ECF_WRITER
+			-- `ecf_writer' model for Current.
 
 feature {NONE} -- Implementation: ECF Write
 

@@ -439,7 +439,7 @@ feature {NONE} -- Implementation: Creators
 			create uuid_hbox
 			create uuid_label.make_with_text ("Generated UUID: ")
 			create l_randomizer
-			create uuid_text.make_with_text (l_randomizer.uuid.out)
+			create uuid_text.make_with_text (ecf_writer.ecf_uuid.attached_item.out)
 			uuid_text.disable_edit
 		end
 
@@ -584,6 +584,8 @@ feature {NONE} -- Implementation: Initializers
 
 			ecf_hbox.set_padding (2)
 			ecf_hbox.set_border_width (2)
+
+			ecf_text.change_actions.extend (agent ecf_writer.set_ecf_name)
 		end
 
 	init_github_controls
@@ -595,6 +597,8 @@ feature {NONE} -- Implementation: Initializers
 
 			github_hbox.set_padding (2)
 			github_hbox.set_border_width (2)
+
+			github_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
 		end
 
 	init_uuid_controls
@@ -607,6 +611,7 @@ feature {NONE} -- Implementation: Initializers
 			uuid_hbox.set_padding (2)
 			uuid_hbox.set_border_width (2)
 
+			uuid_text.change_actions.extend (agent ecf_writer.set_uuid_with_text)
 		end
 
 	init_std_list_controls

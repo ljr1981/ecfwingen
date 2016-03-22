@@ -8,7 +8,6 @@
 		</option>
 		<setting name="concurrency" value="none"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base-safe.ecf"/>
-		<library name="class_attribute" location="$GITHUB\class_attribute\class_attribute.ecf"/>
 		<library name="process" location="$ISE_LIBRARY\library\process\process-safe.ecf"/>
 		<library name="pub_sub" location="$GITHUB\pub_sub\pub_sub.ecf"/>
 		<library name="randomizer" location="$GITHUB\randomizer\randomizer.ecf"/>
@@ -20,11 +19,11 @@
 		<library name="vision2_extension" location="$ISE_LIBRARY\library\vision2_extension\vision2_extension-safe.ecf"/>
 		<cluster name="ecfwingen" location=".\" recursive="true">
 			<file_rule>
+				<exclude>/.git$</exclude>
+				<exclude>/.svn$</exclude>
+				<exclude>/CVS$</exclude>
 				<exclude>/EIFGENs$</exclude>
 				<exclude>tests</exclude>
-				<exclude>/CVS$</exclude>
-				<exclude>/.svn$</exclude>
-				<exclude>/.git$</exclude>
 			</file_rule>
 		</cluster>
 	</target>
@@ -33,9 +32,9 @@
 		<root class="ANY" feature="default_create"/>
 		<file_rule>
 			<exclude>/.git$</exclude>
-			<exclude>/EIFGENs$</exclude>
-			<exclude>/CVS$</exclude>
 			<exclude>/.svn$</exclude>
+			<exclude>/CVS$</exclude>
+			<exclude>/EIFGENs$</exclude>
 			<include>tests</include>
 		</file_rule>
 		<option profile="false">

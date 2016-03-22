@@ -24,7 +24,7 @@ feature {NONE} -- Initialization
 		do
 			create ecf_name.make_empty
 			create root_folder_name.make_empty
-			create ecf_uuid
+			create ecf_uuid.make_empty
 			create std_libraries.make (10)
 			create test_libraries.make (10)
 			create github_libraries.make (10)
@@ -32,13 +32,13 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	ecf_name: STRING_ATTRIBUTE
+	ecf_name: STRING
 			-- `ecf_name' (project and file).
 
-	root_folder_name: STRING_ATTRIBUTE
+	root_folder_name: STRING
 			-- `root_folder_name' for `ecf_name' file.
 
-	ecf_uuid: UUID_ATTRIBUTE
+	ecf_uuid: STRING
 			-- `ecf_uuid' for ECF file.
 
 	std_libraries: ARRAYED_LIST [STRING]
@@ -62,21 +62,21 @@ feature -- Access
 
 feature -- Settings
 
-	set_ecf_name (a_name: like ecf_name.attached_item)
+	set_ecf_name (a_name: like ecf_name)
 			-- `set_ecf_name' with `a_name'.
 		do
-			ecf_name.set_item (a_name)
+			ecf_name := a_name
 		end
 
-	set_root_folder_name (a_name: like root_folder_name.attached_item)
+	set_root_folder_name (a_name: like root_folder_name)
 			-- `' with `a_name'.
 		do
-			root_folder_name.set_item (a_name)
+			root_folder_name := a_name
 		end
 
 	set_uuid_with_text (a_uuid_string: STRING)
 		do
-			create ecf_uuid.make_with_objects (create {UUID}.make_from_string (a_uuid_string))
+			create ecf_uuid.make_from_string (a_uuid_string)
 		end
 
 end

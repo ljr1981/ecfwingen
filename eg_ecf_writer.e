@@ -24,10 +24,12 @@ feature {NONE} -- Initialization
 		do
 			create ecf_name.make_empty
 			create root_folder_name.make_empty
-			create ecf_uuid.make_empty
+			ecf_uuid := (create {RANDOMIZER}).uuid
 			create std_libraries.make (10)
 			create test_libraries.make (10)
 			create github_libraries.make (10)
+		ensure then
+			ecf_uuid_valid: ecf_uuid.is_valid_uuid (ecf_uuid.out)
 		end
 
 feature -- Access
@@ -38,7 +40,7 @@ feature -- Access
 	root_folder_name: STRING
 			-- `root_folder_name' for `ecf_name' file.
 
-	ecf_uuid: STRING
+	ecf_uuid: UUID
 			-- `ecf_uuid' for ECF file.
 
 	std_libraries: ARRAYED_LIST [STRING]

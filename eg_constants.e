@@ -107,10 +107,15 @@ inherit
 			default_create
 		end
 
+	TEST_SET_BRIDGE
+		undefine
+			default_create
+		end
+
 feature -- Test routines
 
-	abc_tests
-			-- `abc_tests'
+	<<TEST_CLASS_NAME>>_tests
+			-- `<<TEST_CLASS_NAME>>_tests'
 		do
 			do_nothing -- yet ...
 		end

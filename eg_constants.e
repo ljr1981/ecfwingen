@@ -19,6 +19,8 @@ feature -- Constants
 			Result.force ("<<GITHUB_LIBRARAY_LIST>>", 5)
 			Result.force ("<<TESTING_LIBRARY_LIST>>", 6)
 			Result.force ("<<LIBRARY_NAME>>", 7)
+			Result.force ("<<EWF_LIBRARY_LIST>>", 8)
+			Result.force ("<<PATH_FRAGMENT>>", 9)
 		end
 
 	ecf_name_tag: INTEGER = 1
@@ -28,6 +30,8 @@ feature -- Constants
 	github_library_list_tag: INTEGER = 5
 	testing_library_list_tag: INTEGER = 6
 	library_name_tag: INTEGER = 7
+	ewf_library_list_tag: INTEGER = 8
+	path_fragment_tag: INTEGER = 9
 
 	ecf_template_string: STRING = "[
 <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -42,6 +46,8 @@ feature -- Constants
 <<SCOOPABLE>>
 <<STANDARD_LIBRARY_LIST>>
 <<GITHUB_LIBRARAY_LIST>>
+<<EWF_LIBRARY_LIST>>
+		<library name="test_extension" location="$GITHUB\test_extension\test_extension.ecf"/>
 		<cluster name="<<ECF_NAME>>" location=".\" recursive="true">
 			<file_rule>
 				<exclude>/.git$</exclude>
@@ -84,6 +90,19 @@ feature -- Constants
 		<library name="<<LIBRARY_NAME>>" location="$GITHUB\<<LIBRARY_NAME>>\<<LIBRARY_NAME>>.ecf"/>
 ]"
 
+	ewf_library_list_item_template_string: STRING = "[
+		<library name="<<LIBRARY_NAME>>" location="$GITHUB\ewf\library\<<PATH_FRAGMENT>>"/>
+]"
+
+	http_library_name_string: STRING = 					"http-safe"
+	http_library_string: STRING = 						"network\protocol\http\http-safe.ecf"
+	default_standalone_library_name_string: STRING =	"default_standalone"
+	default_standalone_library_string: STRING = 		"server\wsf\default\standalone-safe.ecf"
+	wsf_library_name_string: STRING = 					"wsf-safe"
+	wsf_library_string: STRING = 						"server\wsf\wsf-safe.ecf"
+	encoder_library_name_string: STRING = 				"encoder-safe"
+	encoder_library_string: STRING = 					"text\encoder\encoder-safe.ecf"
+
 	testing_library_list_item_template_string: STRING = "[
 		<library name="<<LIBRARY_NAME>>" location="$ISE_LIBRARY\library\<<LIBRARY_NAME>>\<<LIBRARY_NAME>>-safe.ecf"/>
 ]"
@@ -123,5 +142,56 @@ feature -- Test routines
 end
 
 ]"
+
+	EWF_application_class_text: STRING
+			-- `EWF_application_class_text' or APPLICATION.e
+		local
+			l_directory: DIRECTORY
+			l_path: PATH
+			l_file: PLAIN_TEXT_FILE
+			l_env: EXECUTION_ENVIRONMENT
+		once
+			create Result.make_empty
+			create l_env
+			create l_path.make_from_string (l_env.current_working_path.name + "\ewf\application.stub")
+			create l_file.make_open_read (l_path.name.out)
+			l_file.read_stream (l_file.count)
+			Result := l_file.last_string.twin
+			l_file.close
+		end
+
+	EWF_app_execution_class_text: STRING
+			-- `EWF_app_execution_class_text' or APP_EXECUTION.e
+		local
+			l_directory: DIRECTORY
+			l_path: PATH
+			l_file: PLAIN_TEXT_FILE
+			l_env: EXECUTION_ENVIRONMENT
+		once
+			create Result.make_empty
+			create l_env
+			create l_path.make_from_string (l_env.current_working_path.name + "\ewf\app_execution.stub")
+			create l_file.make_open_read (l_path.name.out)
+			l_file.read_stream (l_file.count)
+			Result := l_file.last_string.twin
+			l_file.close
+		end
+
+	EWF_ini_text: STRING
+			-- `EWF_ini_text' or APP_EXECUTION.e
+		local
+			l_directory: DIRECTORY
+			l_path: PATH
+			l_file: PLAIN_TEXT_FILE
+			l_env: EXECUTION_ENVIRONMENT
+		once
+			create Result.make_empty
+			create l_env
+			create l_path.make_from_string (l_env.current_working_path.name + "\ewf\ewf.ini")
+			create l_file.make_open_read (l_path.name.out)
+			l_file.read_stream (l_file.count)
+			Result := l_file.last_string.twin
+			l_file.close
+		end
 
 end

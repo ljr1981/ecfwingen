@@ -49,13 +49,15 @@ feature {NONE} -- Initialization
 		do
 			create ecf_writer
 			create_primary_containers
-			create_ecf_widgets
 			create_github_widgets
+			create_ecf_widgets
+			create_EWF_widgets
 			create_uuid_widgets
 			create_std_lib_widgets
 			create_testing_lib_widgets
 			create_testing_lib_widgets
 			create_github_lib_widgets
+			create_ewf_lib_widgets
 			create_create_and_cancel_widgets
 			create_validators
 			Precursor
@@ -63,16 +65,15 @@ feature {NONE} -- Initialization
 
 	initialize
 			-- <Precursor>
-		local
-			l_file: PLAIN_TEXT_FILE
-			l_list: LIST [STRING]
 		do
 			init_ecf_controls
 			init_github_controls
+			init_ewf_controls
 			init_uuid_controls
 			init_std_list_controls
 			init_test_list_controls
 			init_github_list_controls
+			init_EWF_list_controls
 			init_all_libraries_vbox
 			init_create_and_cancel_controls
 			place_in_main_box
@@ -92,6 +93,11 @@ feature {NONE} -- Implementation: Access
 
 	ecf_writer: EG_ECF_WRITER
 			-- `ecf_writer' model for Current.
+
+feature -- Flags
+
+	include_ewf_classes: BOOLEAN
+			-- `include_ewf_classes' in creation of new ECF?
 
 feature {NONE} -- Implementation: ECF Write
 
@@ -155,6 +161,7 @@ feature {NONE} -- Implementation: ECF Write
 			replace_scoopable (ecf_content, scooped_check.is_selected)
 			replace_standard (ecf_content)
 			replace_github (ecf_content)
+			replace_ewf (ecf_content)
 			replace_testing (ecf_content)
 		end
 
@@ -212,6 +219,31 @@ feature {NONE} -- Implementation: ECF Write
 				l_file.put_string (al_content)
 				l_file.close
 			end
+			create_any_included_classes (a_path)
+		end
+
+	create_any_included_classes (a_path: PATH)
+			-- `create_any_included_classes' based on ECF builder settings.
+		local
+			l_file: PLAIN_TEXT_FILE
+		do
+			if include_ewf_classes then
+				create l_file.make_create_read_write (a_path.name.out + "\application.e")
+				l_file.put_string (constants.ewf_application_class_text)
+				l_file.flush
+				l_file.close
+
+				create l_file.make_create_read_write (a_path.name.out + "\app_execution.e")
+				l_file.put_string (constants.ewf_app_execution_class_text)
+				l_file.flush
+				l_file.close
+
+				create l_file.make_create_read_write (a_path.name.out + "\ewf.ini")
+				l_file.put_string (constants.ewf_ini_text)
+				l_file.flush
+				l_file.close
+
+			end
 		end
 
 feature {NONE} -- Implementation: Replacements
@@ -230,6 +262,38 @@ feature {NONE} -- Implementation: Replacements
 			check attached {STRING} constants.tag_list.item (constants.github_library_list_tag) as al_tag then
 				replace_library (a_content, constants.github_library_list_item_template_string, al_tag, github_lib_list)
 			end
+		end
+
+	replace_EWF (a_content: STRING)
+		local
+			l_replacement: STRING
+		do
+			create l_replacement.make_empty
+			include_ewf_classes := ewf_lib_list.checked_items.count > 0
+			if across ewf_lib_list.checked_items as ic_libs some ic_libs.item.text.same_string (constants.http_library_name_string) end then
+				l_replacement.append_string (replace_EWF_string (constants.http_library_name_string, constants.http_library_string))
+			end
+			if across ewf_lib_list.checked_items as ic_libs some ic_libs.item.text.same_string (constants.encoder_library_name_string) end then
+				l_replacement.append_string (replace_EWF_string (constants.encoder_library_name_string, constants.encoder_library_string))
+			end
+			if across ewf_lib_list.checked_items as ic_libs some ic_libs.item.text.same_string (constants.default_standalone_library_name_string) end then
+				l_replacement.append_string (replace_EWF_string (constants.default_standalone_library_name_string, constants.default_standalone_library_string))
+			end
+			if across ewf_lib_list.checked_items as ic_libs some ic_libs.item.text.same_string (constants.wsf_library_name_string) end then
+				l_replacement.append_string (replace_EWF_string (constants.wsf_library_name_string, constants.wsf_library_string))
+			end
+			check attached constants.tag_list [constants.ewf_library_list_tag] as al_tag then
+				a_content.replace_substring_all (al_tag, l_replacement)
+			end
+		end
+
+	replace_EWF_string (a_library_name, a_fragment: STRING): STRING
+		do
+			create Result.make_empty
+			Result.append_string (constants.ewf_library_list_item_template_string)
+			Result.replace_substring_all ("<<LIBRARY_NAME>>", a_library_name)
+			Result.replace_substring_all ("<<PATH_FRAGMENT>>", a_fragment)
+			Result.append_character ('%N')
 		end
 
 	replace_testing (a_content: STRING)
@@ -301,6 +365,11 @@ feature {NONE} -- Implementation: GUI
 	github_label: EV_LABEL
 	github_text: EV_TEXT_FIELD
 
+		-- EWF controls
+	EWF_hbox: EV_HORIZONTAL_BOX
+	EWF_label: EV_LABEL
+	EWF_text: EV_TEXT_FIELD
+
 		-- UUID controls
 	uuid_hbox: EV_HORIZONTAL_BOX
 	uuid_label: EV_LABEL
@@ -333,6 +402,11 @@ feature {NONE} -- Implementation: GUI
 	github_lib_label: EV_LABEL
 	github_lib_list: EV_CHECKABLE_LIST
 
+		-- EWF Library controls
+	ewf_lib_vbox: EV_VERTICAL_BOX
+	ewf_lib_label: EV_LABEL
+	ewf_lib_list: EV_CHECKABLE_LIST
+
 		-- Create and Cancel controls
 	control_hbox: EV_HORIZONTAL_BOX
 	create_button: EV_BUTTON
@@ -359,6 +433,9 @@ feature {NONE} -- Implementation: Validators
 
 	github_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
 			-- `github_list_validator' to validate `github_lib_list'.
+
+	EWF_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
+			-- `EWF_list_validator' to validate `EWF_lib_list'.
 
 feature {NONE} -- Implementation: Constants
 
@@ -421,6 +498,24 @@ feature {NONE} -- Implementation: Creators
 			else
 				create github_text.make_with_text ("Unknown ...")
 				github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
+			end
+			github_text.disable_edit
+		end
+
+	create_EWF_widgets
+			-- `create_EWF_widgets' for Current.
+		local
+			l_env: EXECUTION_ENVIRONMENT
+		do
+			create EWF_hbox
+			create EWF_label.make_with_text ("GITHUB environment variable: ")
+			create l_env
+			if attached {STRING_32} l_env.starting_environment ["GITHUB"] as al_github_path  then
+				create EWF_text.make_with_text (al_github_path)
+				EWF_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 1.0))
+			else
+				create EWF_text.make_with_text ("Unknown ...")
+				EWF_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
 			end
 			github_text.disable_edit
 		end
@@ -509,6 +604,16 @@ feature {NONE} -- Implementation: Creators
 			github_lib_list.set_minimum_height (150)
 		end
 
+	create_ewf_lib_widgets
+			-- `create_ewf_lib_widgets' for Current.
+		do
+			create ewf_lib_vbox
+			create ewf_lib_label.make_with_text ("EWF libraries:")
+			ewf_lib_label.align_text_left
+			create ewf_lib_list
+			ewf_lib_list.set_minimum_height (150)
+		end
+
 	create_create_and_cancel_widgets
 				-- `create_create_and_cancel_widgets' for Current.
 		note
@@ -552,6 +657,7 @@ feature {NONE} -- Implementation: Creators
 			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
 			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
 			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
+			create EWF_list_validator.make (EWF_lib_list, create {EG_LIST_ITEM})
 
 				-- Validation controller and item
 			create validation_controller.make_with_machine (create {VA_MACHINE})
@@ -561,6 +667,7 @@ feature {NONE} -- Implementation: Creators
 			validation_controller_item.add_rule (agent std_list_validator.is_valid)
 			validation_controller_item.add_rule (agent test_list_validator.is_valid)
 			validation_controller_item.add_rule (agent github_list_validator.is_valid)
+			validation_controller_item.add_rule (agent EWF_list_validator.is_valid)
 
 				-- Validation triggering
 				-- Temporary bandaid code: Really needs to be pub-sub'd
@@ -571,6 +678,8 @@ feature {NONE} -- Implementation: Creators
 			test_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
 			github_lib_list.check_actions.extend (agent on_list_check_validation_controller)
 			github_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
+			EWF_lib_list.check_actions.extend (agent on_list_check_validation_controller)
+			EWF_lib_list.uncheck_actions.extend (agent on_list_check_validation_controller)
 		end
 
 feature {NONE} -- Implementation: Initializers
@@ -597,6 +706,19 @@ feature {NONE} -- Implementation: Initializers
 			github_hbox.set_border_width (2)
 
 			github_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
+		end
+
+	init_ewf_controls
+			-- `init_ewf_controls' for Current.
+		do
+			EWF_hbox.extend (EWF_label)
+			EWF_hbox.extend (EWF_text)
+			EWF_hbox.disable_item_expand (EWF_label)
+
+			EWF_hbox.set_padding (2)
+			EWF_hbox.set_border_width (2)
+
+			--EWF_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
 		end
 
 	init_uuid_controls
@@ -663,8 +785,19 @@ feature {NONE} -- Implementation: Initializers
 
 			github_lib_vbox.set_padding (2)
 			github_lib_vbox.set_border_width (2)
+		end
 
-			lower_libraries_hbox.extend (create {EV_CELL})
+	init_EWF_list_controls
+			-- `init_EWF_list_controls' for Current.
+		do
+			EWF_lib_vbox.extend (EWF_lib_label)
+			EWF_lib_vbox.extend (EWF_lib_list)
+			EWF_lib_vbox.disable_item_expand (EWF_lib_label)
+			EWF_lib_vbox.disable_item_expand (EWF_lib_list)
+			lower_libraries_hbox.extend (EWF_lib_vbox)
+
+			EWF_lib_vbox.set_padding (2)
+			EWF_lib_vbox.set_border_width (2)
 		end
 
 	init_all_libraries_vbox
@@ -718,6 +851,11 @@ feature {NONE} -- Implementation: Initializers
 			load_library_list ("test_libs.ini", test_lib_list)
 			load_library_list ("github_libs.ini", github_lib_list)
 
+				-- EWF
+			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.default_standalone_library_name_string))
+			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.encoder_library_name_string))
+			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.http_library_name_string))
+			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.wsf_library_name_string))
 		end
 
 	load_library_list (a_ini_name: STRING; a_lib_list: EV_CHECKABLE_LIST)

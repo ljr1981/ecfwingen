@@ -667,7 +667,7 @@ feature {NONE} -- Implementation: Creators
 			validation_controller_item.add_rule (agent std_list_validator.is_valid)
 			validation_controller_item.add_rule (agent test_list_validator.is_valid)
 			validation_controller_item.add_rule (agent github_list_validator.is_valid)
-			validation_controller_item.add_rule (agent EWF_list_validator.is_valid)
+--			validation_controller_item.add_rule (agent EWF_list_validator.is_valid)
 
 				-- Validation triggering
 				-- Temporary bandaid code: Really needs to be pub-sub'd

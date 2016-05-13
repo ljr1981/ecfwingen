@@ -163,6 +163,13 @@ feature {NONE} -- Implementation: ECF Write
 			replace_github (ecf_content)
 			replace_ewf (ecf_content)
 			replace_testing (ecf_content)
+			if is_include_ewf_material then
+				ecf_content.replace_substring_all ({EG_CONSTANTS}.root_class_and_procedure_app_tag, {EG_CONSTANTS}.root_for_ewf)
+				ecf_content.replace_substring_all ({EG_CONSTANTS}.root_class_and_proceudre_test_tag, {EG_CONSTANTS}.root_for_ewf)
+			else
+				ecf_content.replace_substring_all ({EG_CONSTANTS}.root_class_and_procedure_app_tag, {EG_CONSTANTS}.root_for_compile_all)
+				ecf_content.replace_substring_all ({EG_CONSTANTS}.root_class_and_proceudre_test_tag, {EG_CONSTANTS}.root_for_testing)
+			end
 		end
 
 	write_root_folder

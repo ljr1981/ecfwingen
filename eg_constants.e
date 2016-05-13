@@ -33,12 +33,19 @@ feature -- Constants
 	ewf_library_list_tag: INTEGER = 8
 	path_fragment_tag: INTEGER = 9
 
+	root_class_and_procedure_app_tag: STRING = "<<ROOT_CLASS_PROCEDURE>>"
+	root_class_and_proceudre_test_tag: STRING = "<<ROOT_CLASS_PROCEDURE_TEST>>"
+
+	root_for_compile_all: STRING = "<root all_classes=%"true%"/>"
+	root_for_testing: STRING = "<root class=%"ANY%" feature=%"default_create%"/>"
+	root_for_ewf: STRING = "<root class=%"APPLICATION%" feature=%"make_and_launch%"/>"
+
 	ecf_template_string: STRING = "[
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <system xmlns="http://www.eiffel.com/developers/xml/configuration-1-15-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eiffel.com/developers/xml/configuration-1-15-0 http://www.eiffel.com/developers/xml/configuration-1-15-0.xsd" name="<<ECF_NAME>>" uuid="<<UUID>>" readonly="false">
 	<description><<ECF_NAME>> implementation</description>
 	<target name="<<ECF_NAME>>">
-		<root all_classes="true"/>
+		<<ROOT_CLASS_PROCEDURE>>
 		<option warning="true" void_safety="transitional" syntax="provisional">
 			<assertions precondition="true" postcondition="true" check="true" invariant="true" loop="true" supplier_precondition="true"/>
 		</option>
@@ -60,7 +67,7 @@ feature -- Constants
 	</target>
 	<target name="test" extends="<<ECF_NAME>>">
 		<description><<ECF_NAME>> Tests</description>
-		<root class="ANY" feature="default_create"/>
+		<<ROOT_CLASS_PROCEDURE_TEST>>
 		<file_rule>
 			<exclude>/.git$</exclude>
 			<exclude>/.svn$</exclude>

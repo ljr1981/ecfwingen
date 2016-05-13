@@ -853,16 +853,26 @@ feature {NONE} -- Implementation: Initializers
 
 	load_all_library_lists
 			-- `load_all_library_lists' for Current.
+		local
+			l_default_lib,
+			l_encoder_lib,
+			l_http_lib,
+			l_wsf_lib: EV_LIST_ITEM
 		do
 			load_library_list ("std_libs.ini", std_lib_list)
 			load_library_list ("test_libs.ini", test_lib_list)
 			load_library_list ("github_libs.ini", github_lib_list)
 
 				-- EWF
-			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.default_standalone_library_name_string))
-			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.encoder_library_name_string))
-			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.http_library_name_string))
-			EWF_lib_list.force (create {EV_LIST_ITEM}.make_with_text (constants.wsf_library_name_string))
+			create l_default_lib.make_with_text (constants.default_standalone_library_name_string)
+			create l_encoder_lib.make_with_text (constants.encoder_library_name_string)
+			create l_http_lib.make_with_text (constants.http_library_name_string)
+			create l_wsf_lib.make_with_text (constants.wsf_library_name_string)
+
+			EWF_lib_list.force (l_default_lib)
+			EWF_lib_list.force (l_encoder_lib)
+			EWF_lib_list.force (l_http_lib)
+			EWF_lib_list.force (l_wsf_lib)
 		end
 
 	load_library_list (a_ini_name: STRING; a_lib_list: EV_CHECKABLE_LIST)

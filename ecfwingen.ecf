@@ -30,7 +30,7 @@
 	</target>
 	<target name="test" extends="ecfwingen">
 		<description>Pub sub test</description>
-		<root class="ANY" feature="default_create"/>
+		<root class="EG_APPLICATION" feature="make"/>
 		<file_rule>
 			<exclude>/.git$</exclude>
 			<exclude>/.svn$</exclude>

@@ -96,8 +96,8 @@ feature {NONE} -- Implementation: Access
 
 feature -- Flags
 
-	include_ewf_classes: BOOLEAN
-			-- `include_ewf_classes' in creation of new ECF?
+	is_include_ewf_material: BOOLEAN
+			-- `is_include_ewf_material' in creation of new ECF?
 
 feature {NONE} -- Implementation: ECF Write
 
@@ -172,6 +172,7 @@ feature {NONE} -- Implementation: ECF Write
 		do
 			create l_path.make_from_string (github_text.text + "\" + ecf_text.text)
 			create_folder (l_path, l_path.absolute_path.name + "\" + ecf_text.text + ".ecf", ecf_content)
+			create_any_included_classes (l_path)
 		end
 
 	write_test_folder_and_class
@@ -219,7 +220,6 @@ feature {NONE} -- Implementation: ECF Write
 				l_file.put_string (al_content)
 				l_file.close
 			end
-			create_any_included_classes (a_path)
 		end
 
 	create_any_included_classes (a_path: PATH)
@@ -227,7 +227,7 @@ feature {NONE} -- Implementation: ECF Write
 		local
 			l_file: PLAIN_TEXT_FILE
 		do
-			if include_ewf_classes then
+			if is_include_ewf_material then
 				create l_file.make_create_read_write (a_path.name.out + "\application.e")
 				l_file.put_string (constants.ewf_application_class_text)
 				l_file.flush
@@ -269,7 +269,7 @@ feature {NONE} -- Implementation: Replacements
 			l_replacement: STRING
 		do
 			create l_replacement.make_empty
-			include_ewf_classes := ewf_lib_list.checked_items.count > 0
+			is_include_ewf_material := ewf_lib_list.checked_items.count > 0
 			if across ewf_lib_list.checked_items as ic_libs some ic_libs.item.text.same_string (constants.http_library_name_string) end then
 				l_replacement.append_string (replace_EWF_string (constants.http_library_name_string, constants.http_library_string))
 			end

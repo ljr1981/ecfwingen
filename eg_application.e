@@ -20,7 +20,7 @@ feature {NONE} -- Initialization
 			create application
 			create window.make_with_title ("ECF Generator for Windows")
 			window.close_request_actions.extend (agent application.destroy)
-			window.set_size (550, 650)
+			window.set_size (550, 510)
 			application.post_launch_actions.extend (agent window.show)
 			application.launch
 		end

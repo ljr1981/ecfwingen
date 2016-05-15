@@ -452,6 +452,9 @@ feature {NONE} -- Implementation: Constants
 			create Result
 		end
 
+	default_padding_size: INTEGER = 2
+	default_border_width: INTEGER = 2
+
 feature {NONE} -- Implementation: Creators
 
 	create_primary_containers
@@ -698,8 +701,8 @@ feature {NONE} -- Implementation: Initializers
 			ecf_hbox.extend (ecf_text)
 			ecf_hbox.disable_item_expand (ecf_label)
 
-			ecf_hbox.set_padding (2)
-			ecf_hbox.set_border_width (2)
+			ecf_hbox.set_padding (Default_padding_size)
+			ecf_hbox.set_border_width (Default_border_width)
 		end
 
 	init_github_controls
@@ -709,8 +712,8 @@ feature {NONE} -- Implementation: Initializers
 			github_hbox.extend (github_text)
 			github_hbox.disable_item_expand (github_label)
 
-			github_hbox.set_padding (2)
-			github_hbox.set_border_width (2)
+			github_hbox.set_padding (Default_padding_size)
+			github_hbox.set_border_width (Default_border_width)
 
 			github_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
 		end
@@ -722,8 +725,8 @@ feature {NONE} -- Implementation: Initializers
 			EWF_hbox.extend (EWF_text)
 			EWF_hbox.disable_item_expand (EWF_label)
 
-			EWF_hbox.set_padding (2)
-			EWF_hbox.set_border_width (2)
+			EWF_hbox.set_padding (Default_padding_size)
+			EWF_hbox.set_border_width (Default_border_width)
 
 			--EWF_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
 		end
@@ -735,8 +738,8 @@ feature {NONE} -- Implementation: Initializers
 			uuid_hbox.extend (uuid_text)
 			uuid_hbox.disable_item_expand (uuid_label)
 
-			uuid_hbox.set_padding (2)
-			uuid_hbox.set_border_width (2)
+			uuid_hbox.set_padding (Default_padding_size)
+			uuid_hbox.set_border_width (Default_border_width)
 
 			uuid_text.change_actions.extend (agent ecf_writer.set_uuid_with_text)
 		end
@@ -746,20 +749,20 @@ feature {NONE} -- Implementation: Initializers
 		do
 			std_lib_vbox.extend (std_lib_label)
 			std_lib_vbox.extend (std_lib_list)
-			std_lib_vbox.extend (threaded_check)
-			std_lib_vbox.extend (scooped_check)
-			std_lib_vbox.extend (windows_app)
-			std_lib_vbox.extend (docs_init)
+--			std_lib_vbox.extend (threaded_check)
+--			std_lib_vbox.extend (scooped_check)
+--			std_lib_vbox.extend (windows_app)
+--			std_lib_vbox.extend (docs_init)
 			std_lib_vbox.disable_item_expand (std_lib_label)
 			std_lib_vbox.disable_item_expand (std_lib_list)
-			std_lib_vbox.disable_item_expand (threaded_check)
-			std_lib_vbox.disable_item_expand (scooped_check)
-			std_lib_vbox.disable_item_expand (windows_app)
-			std_lib_vbox.disable_item_expand (docs_init)
+--			std_lib_vbox.disable_item_expand (threaded_check)
+--			std_lib_vbox.disable_item_expand (scooped_check)
+--			std_lib_vbox.disable_item_expand (windows_app)
+--			std_lib_vbox.disable_item_expand (docs_init)
 			upper_libraries_hbox.extend (std_lib_vbox)
 
-			std_lib_vbox.set_padding (2)
-			std_lib_vbox.set_border_width (2)
+			std_lib_vbox.set_padding (Default_padding_size)
+			std_lib_vbox.set_border_width (Default_border_width)
 
 		end
 
@@ -768,16 +771,16 @@ feature {NONE} -- Implementation: Initializers
 		do
 			test_lib_vbox.extend (test_lib_label)
 			test_lib_vbox.extend (test_lib_list)
-			test_lib_vbox.extend (init_mock_check)
-			test_lib_vbox.extend (init_test_set_check)
+--			test_lib_vbox.extend (init_mock_check)
+--			test_lib_vbox.extend (init_test_set_check)
 			test_lib_vbox.disable_item_expand (test_lib_label)
 			test_lib_vbox.disable_item_expand (test_lib_list)
-			test_lib_vbox.disable_item_expand (init_mock_check)
-			test_lib_vbox.disable_item_expand (init_test_set_check)
+--			test_lib_vbox.disable_item_expand (init_mock_check)
+--			test_lib_vbox.disable_item_expand (init_test_set_check)
 			upper_libraries_hbox.extend (test_lib_vbox)
 
-			test_lib_vbox.set_padding (2)
-			test_lib_vbox.set_border_width (2)
+			test_lib_vbox.set_padding (Default_padding_size)
+			test_lib_vbox.set_border_width (Default_border_width)
 
 		end
 
@@ -790,8 +793,8 @@ feature {NONE} -- Implementation: Initializers
 			github_lib_vbox.disable_item_expand (github_lib_list)
 			lower_libraries_hbox.extend (github_lib_vbox)
 
-			github_lib_vbox.set_padding (2)
-			github_lib_vbox.set_border_width (2)
+			github_lib_vbox.set_padding (Default_padding_size)
+			github_lib_vbox.set_border_width (Default_border_width)
 		end
 
 	init_EWF_list_controls
@@ -803,8 +806,8 @@ feature {NONE} -- Implementation: Initializers
 			EWF_lib_vbox.disable_item_expand (EWF_lib_list)
 			lower_libraries_hbox.extend (EWF_lib_vbox)
 
-			EWF_lib_vbox.set_padding (2)
-			EWF_lib_vbox.set_border_width (2)
+			EWF_lib_vbox.set_padding (Default_padding_size)
+			EWF_lib_vbox.set_border_width (Default_border_width)
 		end
 
 	init_all_libraries_vbox
@@ -813,8 +816,8 @@ feature {NONE} -- Implementation: Initializers
 			all_libraries_vbox.extend (upper_libraries_hbox)
 			all_libraries_vbox.extend (lower_libraries_hbox)
 
-			all_libraries_vbox.set_padding (2)
-			all_libraries_vbox.set_border_width (2)
+			all_libraries_vbox.set_padding (Default_padding_size)
+			all_libraries_vbox.set_border_width (Default_border_width)
 		end
 
 	init_create_and_cancel_controls
@@ -847,8 +850,8 @@ feature {NONE} -- Implementation: Initializers
 			main_vbox.disable_item_expand (all_libraries_vbox)
 			main_vbox.disable_item_expand (control_hbox)
 
-			main_vbox.set_padding (2)
-			main_vbox.set_border_width (2)
+			main_vbox.set_padding (Default_padding_size)
+			main_vbox.set_border_width (Default_border_width)
 		end
 
 	load_all_library_lists

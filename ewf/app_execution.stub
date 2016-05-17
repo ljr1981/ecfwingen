@@ -1,6 +1,6 @@
 note
 	description: "[
-		Representation of a {APP_EXECUTION}.
+		Representation of a {EWX_APP_EXECUTION_TEMPLATE}.
 		]"
 	design: "[
 		See notes at the end of this class.
@@ -10,11 +10,10 @@ class
 	APP_EXECUTION
 
 inherit
-	WSF_ROUTED_EXECUTION
-
-	WSF_ROUTED_URI_HELPER
-
-	WSF_ROUTED_URI_TEMPLATE_HELPER
+	EWX_APP_EXECUTION
+		redefine
+			setup_router
+		end
 
 create
 	make
@@ -33,6 +32,7 @@ feature {NONE} -- Initialization
 				based on message templates (e.g. `uri_hello')
 				]"
 		do
+			Precursor
 			map_uri_agent (uri_hello, agent hello_request_handler (?, ?), no_request_methods)
 		end
 
@@ -157,15 +157,9 @@ feature {NONE} -- Implementation: Constants
 </style>
 ]"
 
-	no_request_methods: detachable WSF_REQUEST_METHODS
-			-- `no_request_methods' constant.
-		once
-			Result := Void
-		end
-
 note
 	design: "[
-		{APP_EXECUTION} is just a template (starting point) to build from. You may
+		{EWX_APP_EXECUTION} is just a template (starting point) to build from. You may
 		design your application any way you like or want. However, the basics are
 		fairly well established: Each instance of a Web Service has a Router, which
 		uses URI templates to route incoming Client requests through the Web Server

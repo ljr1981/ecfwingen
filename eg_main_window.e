@@ -634,7 +634,7 @@ feature {NONE} -- Implementation: Creators
 		do
 			create control_hbox
 			create create_button.make_with_text ("Create ECF")
-			create cancel_button.make_with_text ("Cancel")
+			create cancel_button.make_with_text ("Close")
 		end
 
 	create_validators

@@ -371,6 +371,7 @@ feature {NONE} -- Implementation: GUI
 	github_hbox: EV_HORIZONTAL_BOX
 	github_label: EV_LABEL
 	github_text: EV_TEXT_FIELD
+	github_button: EV_BUTTON
 
 		-- EWF controls
 	EWF_hbox: EV_HORIZONTAL_BOX
@@ -431,6 +432,9 @@ feature {NONE} -- Implementation: Validators
 
 	ecf_name_validator: VA_EV_TEXT_COMPONENT_VALIDATOR [EG_ECF_NAME_ITEM]
 			-- `ecf_name_validator' to validate `ecf_text'.
+
+	github_path_validator: VA_EV_TEXT_COMPONENT_VALIDATOR [EG_GITHUB_PATH_NAME]
+			-- `github_path_validator' to validate `github_text'.
 
 	std_list_validator: VA_EV_CHECKABLE_LIST_VALIDATOR [EG_LIST_ITEM]
 			-- `std_list_validator' to validate `std_lib_list'.
@@ -496,20 +500,12 @@ feature {NONE} -- Implementation: Creators
 				GITHUB environment variable. This is loaded directly from
 				the {EXECUTION_ENVIRONMENT}.
 				]"
-		local
-			l_env: EXECUTION_ENVIRONMENT
 		do
 			create github_hbox
-			create github_label.make_with_text ("GITHUB environment variable: ")
-			create l_env
-			if attached {STRING_32} l_env.starting_environment ["GITHUB"] as al_github_path  then
-				create github_text.make_with_text (al_github_path)
-				github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 1.0))
-			else
-				create github_text.make_with_text ("Unknown ...")
-				github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
-			end
-			github_text.disable_edit
+			create github_label.make_with_text ("GITHUB path: ")
+			create github_text.make_with_text ("")
+			github_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
+			create github_button.make_with_text ("...")
 		end
 
 	create_EWF_widgets
@@ -518,16 +514,9 @@ feature {NONE} -- Implementation: Creators
 			l_env: EXECUTION_ENVIRONMENT
 		do
 			create EWF_hbox
-			create EWF_label.make_with_text ("GITHUB environment variable: ")
-			create l_env
-			if attached {STRING_32} l_env.starting_environment ["GITHUB"] as al_github_path  then
-				create EWF_text.make_with_text (al_github_path)
-				EWF_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 1.0))
-			else
-				create EWF_text.make_with_text ("Unknown ...")
-				EWF_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
-			end
-			github_text.disable_edit
+			create EWF_label.make_with_text ("GITHUB path: ")
+			create EWF_text.make_with_text ("")
+			EWF_text.set_foreground_color (create {EV_COLOR}.make_with_rgb (1.0, 0, 0))
 		end
 
 	create_uuid_widgets
@@ -664,6 +653,7 @@ feature {NONE} -- Implementation: Creators
 		do
 				-- Validators
 			create ecf_name_validator.make (ecf_text, create {EG_ECF_NAME_ITEM})
+			create github_path_validator.make (github_text, create {EG_GITHUB_PATH_NAME})
 			create std_list_validator.make (std_lib_list, create {EG_LIST_ITEM})
 			create test_list_validator.make (test_lib_list, create {EG_LIST_ITEM})
 			create github_list_validator.make (github_lib_list, create {EG_LIST_ITEM})
@@ -674,6 +664,7 @@ feature {NONE} -- Implementation: Creators
 			create validation_controller_item
 
 			validation_controller_item.add_rule (agent ecf_name_validator.is_valid)
+			validation_controller_item.add_rule (agent github_path_validator.is_valid)
 			validation_controller_item.add_rule (agent std_list_validator.is_valid)
 			validation_controller_item.add_rule (agent test_list_validator.is_valid)
 			validation_controller_item.add_rule (agent github_list_validator.is_valid)
@@ -710,12 +701,31 @@ feature {NONE} -- Implementation: Initializers
 		do
 			github_hbox.extend (github_label)
 			github_hbox.extend (github_text)
+			github_hbox.extend (github_button)
 			github_hbox.disable_item_expand (github_label)
+			github_hbox.disable_item_expand (github_button)
 
 			github_hbox.set_padding (Default_padding_size)
 			github_hbox.set_border_width (Default_border_width)
 
-			github_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
+			--github_text.change_actions.extend (agent ecf_writer.set_root_folder_name)
+			github_button.select_actions.extend (agent on_github_button)
+		end
+
+	on_github_button
+			-- `on_github_button' create directory dialog so user sets GITHUB folder.
+		local
+			l_dialog: EV_DIRECTORY_DIALOG
+		do
+			create l_dialog.make_with_title ("Select GITHUB folder ...")
+			l_dialog.ok_actions.extend (agent set_github_path (l_dialog))
+			l_dialog.show_modal_to_window (Current)
+		end
+
+	set_github_path (a_dialog: EV_DIRECTORY_DIALOG)
+			-- `set_github_path' to `a_dialog' `directory' name.
+		do
+			github_text.set_text (a_dialog.directory)
 		end
 
 	init_ewf_controls

@@ -54,7 +54,7 @@ feature -- Constants
 <<STANDARD_LIBRARY_LIST>>
 <<GITHUB_LIBRARAY_LIST>>
 <<EWF_LIBRARY_LIST>>
-		<library name="test_extension" location="$GITHUB\test_extension\test_extension.ecf"/>
+		<library name="test_extension" location="..\test_extension\test_extension.ecf"/>
 		<cluster name="<<ECF_NAME>>" location=".\" recursive="true">
 			<file_rule>
 				<exclude>/.git$</exclude>
@@ -94,11 +94,11 @@ feature -- Constants
 ]"
 
 	github_library_list_item_template_string: STRING = "[
-		<library name="<<LIBRARY_NAME>>" location="$GITHUB\<<LIBRARY_NAME>>\<<LIBRARY_NAME>>.ecf"/>
+		<library name="<<LIBRARY_NAME>>" location="..\<<LIBRARY_NAME>>\<<LIBRARY_NAME>>.ecf"/>
 ]"
 
 	ewf_library_list_item_template_string: STRING = "[
-		<library name="<<LIBRARY_NAME>>" location="$GITHUB\ewf\library\<<PATH_FRAGMENT>>"/>
+		<library name="<<LIBRARY_NAME>>" location="..\ewf\library\<<PATH_FRAGMENT>>"/>
 ]"
 
 	http_library_name_string: STRING = 					"http-safe"

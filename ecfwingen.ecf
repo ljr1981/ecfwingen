@@ -8,7 +8,7 @@
 		</option>
 		<setting name="concurrency" value="none"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base-safe.ecf"/>
-		<library name="framework" location="..\Framework\framework.ecf"/>
+		<library name="framework" location="..\framework\framework.ecf"/>
 		<library name="process" location="$ISE_LIBRARY\library\process\process-safe.ecf"/>
 		<library name="pub_sub" location="..\pub_sub\pub_sub.ecf"/>
 		<library name="randomizer" location="..\randomizer\randomizer.ecf"/>
